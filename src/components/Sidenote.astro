@@ -1,0 +1,9 @@
+---
+interface Props {
+  width?: string;
+}
+const { width } = Astro.props;
+---
+<span class="sidenote" style={width ? `width: ${width}` : ''}>
+  <slot />
+</span>

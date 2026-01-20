@@ -1,0 +1,110 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Sidenote from '../components/Sidenote.astro';
+---
+
+<BaseLayout title="Gaurang's Website">
+	<section style="margin-bottom: 3rem;">
+		<h1 style="margin-bottom: 0.5rem;">Gaurang’s Website</h1>
+		
+		<h3>Hey there 👋 I'm Gaurang</h3>
+
+		<p>
+			I’m a Research Engineer at <a href="https://www.rtx.com/raytheon">Raytheon Technologies</a>, where I work on multi-agent systems and reinforcement learning. My work focuses on enabling LLMs to plan and execute complex tasks through parallel sub-agents. 
+            <Sidenote>
+                Check out my work on <a href="https://github.com/mathur-exe">GitHub</a> or say hi on <a href="https://x.com/gaurang__mathur">Twitter</a>.
+            </Sidenote>
+            I’ve a particular interest in traceability in agentic systems and mechanistic interpretability in language models.
+		</p>
+
+		<ul style="list-style-type: none; padding: 0;">
+			<li>• <a href="https://dynalist.io/d/2uxXpkcL6M-2JR_JuUpWFyNx">Smelting - Dynalist</a></li>
+			<li>• <a href="https://substantial-soap-96f.notion.site/Blogs-156c76b2a8e980c59994eea17955d154?pvs=25">🧩 Blogs</a></li>
+			<li>• <a href="/blog/continuous-latent-space">🪢 Continuous Latent Space</a></li>
+			<li>• <a href="https://substantial-soap-96f.notion.site/Financial-Digest-2b8c76b2a8e980a98577e1480be35e21?pvs=25">💱 Financial Digest</a></li>
+			<li>• <a href="https://substantial-soap-96f.notion.site/prompt-utils-29dc76b2a8e980259121db80a8870c3c?pvs=25">⌨️ prompt.utils</a></li>
+		</ul>
+
+		<p style="font-size: 0.9em; margin-top: 1.5rem;">
+			<a href="https://www.linkedin.com/in/gaurang-mathur-748988175/">LinkedIn</a> | 
+			<a href="https://x.com/gaurang__mathur">Twitter</a> | 
+			<a href="https://github.com/mathur-exe">GitHub</a>
+		</p>
+	</section>
+
+	<hr />
+
+	<section>
+		<h4>Why this website?</h4>
+		<p>
+			I created this website to document my research, learning journey, and anything else I find intriguing. The notes here span a range of topics: RL, agentic systems, LLM to satellite tech and control theory. While the blogs are still a work in progress, you can read through <strong><a href="/blog/continuous-latent-space">Continuous Latent Space</a></strong> which is sort of like my L2 cache (but updated more frequently).
+		</p>
+
+		<table style="width: 100%; border-collapse: collapse; margin-top: 2rem;">
+			<thead>
+				<tr style="border-bottom: 2px solid var(--border-color); text-align: left;">
+					<th style="padding: 0.5rem; width: 30%;">Category</th>
+					<th style="padding: 0.5rem;">Topics & Links</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr style="border-bottom: 1px solid var(--border-color);">
+					<td style="padding: 0.8rem 0.5rem; font-weight: bold;">DL blogs #DL</td>
+					<td style="padding: 0.8rem 0.5rem;">
+						→ <a href="https://www.notion.so/Gaurang-s-Website-155c76b2a8e9806d946af3d2b258ed3e">BackPropogation: Math & Intuition</a><br/>
+						→ <a href="https://www.notion.so/Gaurang-s-Website-155c76b2a8e9806d946af3d2b258ed3e">Do DL models overfit?</a><br/>
+						→ <a href="https://www.notion.so/Gaurang-s-Website-155c76b2a8e9806d946af3d2b258ed3e">Neural Collapse & Long-Tail in NN</a>
+					</td>
+				</tr>
+				<tr style="border-bottom: 1px solid var(--border-color);">
+					<td style="padding: 0.8rem 0.5rem; font-weight: bold;">System Design</td>
+					<td style="padding: 0.8rem 0.5rem;">
+						→ <a href="https://substantial-soap-96f.notion.site/Design-Pattern-v2-1d3c76b2a8e980d8b0dad8b52de1585d?pvs=24">🧮 Design Pattern v2</a>
+					</td>
+				</tr>
+				<tr style="border-bottom: 1px solid var(--border-color);">
+					<td style="padding: 0.8rem 0.5rem; font-weight: bold;">LLMs</td>
+					<td style="padding: 0.8rem 0.5rem;">
+						→ <a href="https://substantial-soap-96f.notion.site/Positional-Encoding-through-Qs-17cc76b2a8e98082acade59dedbd9813?pvs=24">📟 Positional Encoding through Qs</a>
+					</td>
+				</tr>
+				<tr style="border-bottom: 1px solid var(--border-color);">
+					<td style="padding: 0.8rem 0.5rem; font-weight: bold;">University + SpaceTech #misc</td>
+					<td style="padding: 0.8rem 0.5rem;">
+						→ <a href="https://substantial-soap-96f.notion.site/155c76b2a8e9806d946af3d2b258ed3e?pvs=25">Controls: AODS & Thrust Vectoring for sounding rockets</a><br/>
+						→ <a href="https://substantial-soap-96f.notion.site/155c76b2a8e9806d946af3d2b258ed3e?pvs=25">SAR: Interpretability & Fusion</a>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+	</section>
+
+	<hr />
+
+	<section>
+		<h4>Previous Experience</h4>
+		<ul style="list-style-type: none; padding-left: 0;">
+			<li style="margin-bottom: 1rem;">
+				<strong>Research Intern @ Raytheon Technology</strong>
+				<ul style="margin-top: 0.5rem; color: var(--meta-color); list-style-type: disc; padding-left: 1.5rem;">
+					<li>Developed a knowledge summarization system to curate, collect, and transform scientific information from heterogeneous, unstructured data using agentic pipelines.</li>
+					<li>Built pipelines capable of text classification, mathematical calculations, and structured knowledge representation incorporating human-in-the-loop responses.</li>
+					<li>Rearchitected internal GenAI platform to Event Driven workflow to support Model Context Protocol (MCP).</li>
+				</ul>
+			</li>
+		</ul>
+
+		<h4>Other Achievements</h4>
+		<ul>
+			<li><a href="https://www.instagram.com/sterg_official/">STeRG</a> (Space Technologies and Rocketry Group)</li>
+		</ul>
+
+		<h4>Contact</h4>
+		<p>
+			<a href="mailto:gmathur1993@gmail.com">gmathur1993@gmail.com</a><br/>
+			<a href="https://www.linkedin.com/in/gaurang-mathur-748988175/">LinkedIn</a> | 
+			<a href="https://x.com/gaurang__mathur">Twitter</a> | 
+			<a href="https://github.com/mathur-exe">GitHub</a>
+		</p>
+	</section>
+</BaseLayout>

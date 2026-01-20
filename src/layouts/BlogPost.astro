@@ -1,0 +1,20 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+const { frontmatter } = Astro.props;
+---
+<BaseLayout title={frontmatter.title}>
+  <article>
+    <header style="margin-bottom: 2rem;">
+      <h1>{frontmatter.title}</h1>
+      {frontmatter.date && <p style="color: var(--meta-color);">{frontmatter.date}</p>}
+    </header>
+    
+    <div class="content">
+      <slot />
+    </div>
+
+    <footer style="margin-top: 4rem; padding-top: 2rem; border-top: 1px solid var(--border-color);">
+      <a href="/">← Back to Home</a>
+    </footer>
+  </article>
+</BaseLayout>
