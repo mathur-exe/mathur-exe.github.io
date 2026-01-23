@@ -15,6 +15,7 @@ const blog = defineCollection({
         tabs: z.array(z.object({
             label: z.string(),
             id: z.string(),
+            items: z.array(z.string()).optional(),
         })).optional(),
     }),
 });

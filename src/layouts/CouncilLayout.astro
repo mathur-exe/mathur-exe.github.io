@@ -3,7 +3,11 @@ import '../styles/global.css';
 
 interface Props {
 	title: string;
-	tabs?: { label: string; id: string }[];
+	tabs?: { 
+        label: string; 
+        id: string;
+        items?: string[];
+    }[];
 }
 
 const { title, tabs = [] } = Astro.props;
@@ -30,29 +34,27 @@ const { title, tabs = [] } = Astro.props;
 				</div>
                 
                 {tabs.length > 0 && (
-                    <div class="section-title">OPTIONS</div>
                     <nav class="tabs-nav">
                         {tabs.map((tab, index) => (
-                            <button 
-                                class={`tab-btn ${index === 0 ? 'active' : ''}`} 
-                                data-target={tab.id}
-                            >
-                                {tab.label}
-                            </button>
+                            <div class="nav-group">
+                                <button 
+                                    class={`tab-btn ${index === 0 ? 'active' : ''}`} 
+                                    data-target={tab.id}
+                                >
+                                    {tab.label}
+                                </button>
+                                
+                                {tab.items && tab.items.length > 0 && (
+                                    <ul class="sub-menu">
+                                        {tab.items.map(item => (
+                                            <li>{item}</li>
+                                        ))}
+                                    </ul>
+                                )}
+                            </div>
                         ))}
                     </nav>
                 )}
-
-				<div class="separator"></div>
-
-				<div class="section-title">SLASH COMMANDS</div>
-				<ul class="slash-commands">
-					<li>/council</li>
-					<li>/general-push</li>
-					<li>/fix-bugbot-comment</li>
-					<li>/iterate-browser</li>
-					<li>/fix-ci</li>
-				</ul>
 				
 				<div class="separator"></div>
                 
@@ -161,8 +163,14 @@ const { title, tabs = [] } = Astro.props;
             .tabs-nav {
                 display: flex;
                 flex-direction: column;
-                gap: 0.5rem;
+                gap: 1.5rem;
                 margin-bottom: 2rem;
+            }
+
+            .nav-group {
+                display: flex;
+                flex-direction: column;
+                gap: 0.5rem;
             }
 
             .tab-btn {
@@ -173,38 +181,41 @@ const { title, tabs = [] } = Astro.props;
                 padding: 0.5rem 0.75rem;
                 border-radius: 6px;
                 cursor: pointer;
-                font-size: 0.9rem;
+                font-size: 0.95rem; /* Slightly larger for main headers */
                 transition: all 0.2s;
+                font-weight: 500;
             }
 
             .tab-btn:hover {
-                background-color: rgba(255,255,255,0.05);
                 color: var(--sidebar-text-active);
             }
 
             .tab-btn.active {
-                background-color: rgba(255,255,255,0.1);
                 color: var(--sidebar-text-active);
-                font-weight: 500;
             }
 
-			.slash-commands {
+			.sub-menu {
 				list-style: none;
 				padding: 0;
+                padding-left: 1rem;
 				margin: 0;
                 display: flex;
                 flex-direction: column;
-                gap: 0.8rem;
+                gap: 0.5rem;
 			}
             
-            .slash-commands li {
-                color: var(--sidebar-text);
+            .sub-menu li {
+                color: #666; /* Dimmer than main labels */
                 font-family: "Fira Code", monospace;
                 font-size: 0.85rem;
                 cursor: pointer;
+                padding: 0.2rem 0.5rem;
+                border-radius: 4px;
+                transition: color 0.2s;
             }
-            .slash-commands li:hover {
+            .sub-menu li:hover {
                 color: var(--sidebar-text-active);
+                background: rgba(255,255,255,0.03);
             }
 
             .separator {
