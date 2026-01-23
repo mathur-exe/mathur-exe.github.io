@@ -2,12 +2,36 @@
 title: 'Useful Prompts'
 description: 'Useful prompts for LLMs: slash-commands, SKILL.md, LifeOS'
 pubDate: '2026-01-20'
+layoutType: 'council'
+tabs:
+  - label: GPT / Gemini
+    id: gpt
+  - label: Cursor
+    id: cursor
+  - label: Codex CLI
+    id: codex
 ---
 
-import LinkPreview from '../../components/LinkPreview.astro';
+import RemoteFileViewer from '../../components/RemoteFileViewer.astro';
 
-<LinkPreview
-  title="Ask Questions If Underspecified"
-  description="Clarify requirements before implementing. Do not use automatically, only when invoked explicitly."
-  url="https://github.com/mathur-exe/annotation-notes/blob/main/PaperNotes/dotfiles/codex/skills/ask-questions-if-underspecified/SKILL.md"
-/>
+<div id="gpt" class="tab-panel">
+    <h3>GPT / Gemini Resources</h3>
+    <p>Collection of prompts for general LLM usage.</p>
+    
+    <div class="note-card">
+        <strong>Tip:</strong> Select the <em>Cursor</em> tab to see the detailed skill documentation.
+    </div>
+</div>
+
+<div id="cursor" class="tab-panel">
+    <h3>Cursor Resources</h3>
+    <p>My commands and prompts for Cursor</p>
+    
+    <RemoteFileViewer url="https://raw.githubusercontent.com/mathur-exe/annotation-notes/main/PaperNotes/dotfiles/codex/skills/ask-questions-if-underspecified/SKILL.md" />
+</div>
+
+<div id="codex" class="tab-panel">
+    <h3>Codex CLI Resources</h3>
+    <p>Command line interface tools and configuration.</p>
+    <pre><code>coming soon...</code></pre>
+</div>

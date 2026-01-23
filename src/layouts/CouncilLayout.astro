@@ -1,0 +1,298 @@
+---
+import '../styles/global.css';
+
+interface Props {
+	title: string;
+	tabs?: { label: string; id: string }[];
+}
+
+const { title, tabs = [] } = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="description" content="Personal Website" />
+		<meta name="viewport" content="width=device-width" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<meta name="generator" content={Astro.generator} />
+		<title>{title}</title>
+		<!-- KaTeX -->
+		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" integrity="sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI+WdtXRGWt2kTvGFasHpSy3SV" crossorigin="anonymous">
+	</head>
+	<body>
+		<div class="council-layout">
+			<!-- Sidebar -->
+			<aside class="sidebar">
+				<div class="sidebar-header">
+					<a href="/" class="home-link">← mathur.exe</a>
+				</div>
+                
+                {tabs.length > 0 && (
+                    <div class="section-title">OPTIONS</div>
+                    <nav class="tabs-nav">
+                        {tabs.map((tab, index) => (
+                            <button 
+                                class={`tab-btn ${index === 0 ? 'active' : ''}`} 
+                                data-target={tab.id}
+                            >
+                                {tab.label}
+                            </button>
+                        ))}
+                    </nav>
+                )}
+
+				<div class="separator"></div>
+
+				<div class="section-title">SLASH COMMANDS</div>
+				<ul class="slash-commands">
+					<li>/council</li>
+					<li>/general-push</li>
+					<li>/fix-bugbot-comment</li>
+					<li>/iterate-browser</li>
+					<li>/fix-ci</li>
+				</ul>
+				
+				<div class="separator"></div>
+                
+                <div class="usage-tip">
+                    <p>Send ideas to <a href="#">@mathur_exe</a></p>
+                </div>
+
+			</aside>
+
+			<!-- Main Content -->
+			<main class="main-content">
+				<slot />
+			</main>
+		</div>
+
+		<script>
+			// Vanilla JS Tab Switching
+			document.addEventListener('DOMContentLoaded', () => {
+				const buttons = document.querySelectorAll('.tab-btn');
+				const panels = document.querySelectorAll('.tab-panel');
+
+				// Init: hide all except first (or active)
+                if (panels.length > 0) {
+                    panels.forEach((p, i) => {
+                         if (i === 0) p.style.display = 'block';
+                         else p.style.display = 'none';
+                    });
+                }
+
+				buttons.forEach(btn => {
+					btn.addEventListener('click', () => {
+						// Remove active class from all buttons
+						buttons.forEach(b => b.classList.remove('active'));
+						// Add to clicked
+						btn.classList.add('active');
+
+						// Hide all panels
+						panels.forEach(p => (p as HTMLElement).style.display = 'none');
+
+						// Show target
+						const targetId = btn.getAttribute('data-target');
+						const targetPanel = document.getElementById(targetId || '');
+						if (targetPanel) {
+							targetPanel.style.display = 'block';
+						}
+					});
+				});
+			});
+		</script>
+
+		<style>
+			/* Council Layout Specific Styles */
+			:root {
+				--sidebar-width: 260px;
+                --sidebar-bg: #111;
+                --sidebar-text: #888;
+                --sidebar-text-active: #fff;
+                --main-bg: #0d0d0d; /* Dark theme for this page as per image */
+                --border-color: #333;
+			}
+
+            body {
+                background-color: var(--main-bg);
+                color: #e0e0e0;
+                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+                margin: 0;
+                overflow: hidden; /* App-like */
+                height: 100vh;
+            }
+
+			.council-layout {
+				display: grid;
+				grid-template-columns: var(--sidebar-width) 1fr;
+				height: 100vh;
+			}
+
+			/* Sidebar */
+			.sidebar {
+				background-color: var(--sidebar-bg);
+				border-right: 1px solid var(--border-color);
+				padding: 2rem 1.5rem;
+				display: flex;
+				flex-direction: column;
+                overflow-y: auto;
+			}
+
+            .sidebar-header {
+                margin-bottom: 2rem;
+            }
+            .home-link {
+                color: var(--sidebar-text-active);
+                text-decoration: none;
+                font-size: 0.9rem;
+                font-weight: 500;
+            }
+
+			.section-title {
+				font-size: 0.75rem;
+				text-transform: uppercase;
+				letter-spacing: 0.05em;
+				color: #555;
+				margin-bottom: 1rem;
+				font-weight: 600;
+			}
+
+            .tabs-nav {
+                display: flex;
+                flex-direction: column;
+                gap: 0.5rem;
+                margin-bottom: 2rem;
+            }
+
+            .tab-btn {
+                background: none;
+                border: none;
+                text-align: left;
+                color: var(--sidebar-text);
+                padding: 0.5rem 0.75rem;
+                border-radius: 6px;
+                cursor: pointer;
+                font-size: 0.9rem;
+                transition: all 0.2s;
+            }
+
+            .tab-btn:hover {
+                background-color: rgba(255,255,255,0.05);
+                color: var(--sidebar-text-active);
+            }
+
+            .tab-btn.active {
+                background-color: rgba(255,255,255,0.1);
+                color: var(--sidebar-text-active);
+                font-weight: 500;
+            }
+
+			.slash-commands {
+				list-style: none;
+				padding: 0;
+				margin: 0;
+                display: flex;
+                flex-direction: column;
+                gap: 0.8rem;
+			}
+            
+            .slash-commands li {
+                color: var(--sidebar-text);
+                font-family: "Fira Code", monospace;
+                font-size: 0.85rem;
+                cursor: pointer;
+            }
+            .slash-commands li:hover {
+                color: var(--sidebar-text-active);
+            }
+
+            .separator {
+                height: 1px;
+                background-color: var(--border-color);
+                margin: 2rem 0;
+            }
+            
+            .usage-tip {
+                margin-top: auto;
+                font-size: 0.85rem;
+                color: var(--sidebar-text);
+            }
+            .usage-tip a {
+                color: var(--sidebar-text);
+                text-decoration: none;
+            }
+
+			/* Main Content */
+			.main-content {
+				background-color: var(--main-bg);
+				overflow-y: auto;
+				padding: 0;
+                position: relative;
+			}
+
+            /* Global overrides for this view */
+            :global(h1) {
+                color: #fff;
+                font-size: 1.8rem;
+                margin-top: 2rem;
+            }
+            :global(p) {
+                color: #ccc;
+            }
+            :global(pre) {
+                background: #1a1a1a !important;
+                border: 1px solid #333;
+            }
+
+            @media (max-width: 768px) {
+                .council-layout {
+                    grid-template-columns: 1fr;
+                    height: auto;
+                    overflow: visible;
+                }
+                .sidebar {
+                    height: auto;
+                    border-bottom: 1px solid var(--border-color);
+                }
+                body {
+                    overflow: auto;
+                }
+            }
+
+            /* Content Styles (moved from MDX) */
+            .tab-panel {
+                padding: 2rem 3rem;
+                max-width: 900px;
+                margin: 0 auto;
+                animation: fadeIn 0.3s ease;
+            }
+            
+            .tab-panel h3 {
+                font-size: 1.5rem;
+                color: #fff;
+                margin-bottom: 0.5rem;
+                border-bottom: 1px solid #333;
+                padding-bottom: 1rem;
+            }
+            
+            .tab-panel p {
+                color: #888;
+                margin-bottom: 2rem;
+            }
+
+            .note-card {
+                background: rgba(255,255,255,0.05);
+                border: 1px solid #333;
+                padding: 1rem;
+                border-radius: 6px;
+                color: #ccc;
+            }
+
+            @keyframes fadeIn {
+                from { opacity: 0; transform: translateY(5px); }
+                to { opacity: 1; transform: translateY(0); }
+            }
+		</style>
+	</body>
+</html>

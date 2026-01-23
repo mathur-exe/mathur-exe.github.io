@@ -1,0 +1,68 @@
+---
+import { Code } from 'astro:components';
+
+interface Props {
+  url: string;
+  lang?: string;
+}
+
+const { url, lang = 'markdown' } = Astro.props;
+
+let content = '';
+try {
+  const response = await fetch(url);
+  if (response.ok) {
+    content = await response.text();
+  } else {
+    content = `Failed to fetch file: ${response.statusText}`;
+  }
+} catch (e) {
+  content = `Error fetching file: ${e.message}`;
+}
+---
+
+<div class="remote-file-viewer">
+  <div class="file-header">
+    <span class="file-url">{url.split('/').pop()}</span>
+    <a href={url} target="_blank" rel="noopener noreferrer" class="view-raw">View Raw</a>
+  </div>
+  <Code code={content} lang={lang as any} theme="github-dark" />
+</div>
+
+<style>
+  .remote-file-viewer {
+    border: 1px solid #333;
+    border-radius: 6px;
+    background: #0d1117;
+    overflow: hidden;
+    margin-top: 1rem;
+  }
+  .file-header {
+    background: #161b22;
+    padding: 0.5rem 1rem;
+    border-bottom: 1px solid #333;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.85rem;
+  }
+  .file-url {
+    color: #c9d1d9;
+    font-family: monospace;
+  }
+  .view-raw {
+    color: #58a6ff;
+    text-decoration: none;
+  }
+  .view-raw:hover {
+    text-decoration: underline;
+  }
+  /* Override Astro Code component wrapper if needed */
+  :global(.remote-file-viewer pre) {
+    margin: 0 !important;
+    padding: 1rem !important;
+    overflow-x: auto;
+    border: none !important;
+    border-radius: 0 !important;
+  }
+</style>

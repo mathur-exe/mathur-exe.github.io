@@ -10,6 +10,12 @@ const blog = defineCollection({
         pubDate: z.coerce.date().optional(),
         updatedDate: z.coerce.date().optional(),
         heroImage: z.string().optional(),
+        // Layout config
+        layoutType: z.enum(['council']).optional(),
+        tabs: z.array(z.object({
+            label: z.string(),
+            id: z.string(),
+        })).optional(),
     }),
 });
 

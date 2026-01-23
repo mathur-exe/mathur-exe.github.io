@@ -1,5 +1,6 @@
 ---
 import { getCollection } from 'astro:content';
+import CouncilLayout from '../../layouts/CouncilLayout.astro';
 import BlogPost from '../../layouts/BlogPost.astro';
 
 export async function getStaticPaths() {
@@ -14,6 +15,14 @@ const post = Astro.props;
 const { Content } = await post.render();
 ---
 
-<BlogPost frontmatter={post.data}>
-	<Content />
-</BlogPost>
+{
+    post.data.layoutType === 'council' ? (
+        <CouncilLayout title={post.data.title} tabs={post.data.tabs}>
+            <Content />
+        </CouncilLayout>
+    ) : (
+        <BlogPost frontmatter={post.data}>
+            <Content />
+        </BlogPost>
+    )
+}
