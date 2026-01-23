@@ -4,35 +4,36 @@ description: 'Useful prompts for LLMs: slash-commands, SKILL.md, LifeOS'
 pubDate: '2026-01-20'
 layoutType: 'council'
 tabs:
-  - label: GPT / Gemini
+  - label: ChatGPT / Gemini
     id: gpt
-  - label: Cursor
+  - label: Agent SKILLS
     id: cursor
-    items: ['/council', '/general-push', '/fix-bugbot-comment', '/iterate-browser', '/fix-ci']
-  - label: Codex CLI
+    # Items will be populated dynamically by the page handler
+  - label: Cursor slash-commands
     id: codex
 ---
 
 import RemoteFileViewer from '../../components/RemoteFileViewer.astro';
 
 <div id="gpt" class="tab-panel">
-    <h3>GPT / Gemini Resources</h3>
+    <h3>ChatGPT / Gemini Resources</h3>
     <p>Collection of prompts for general LLM usage.</p>
-    
     <div class="note-card">
-        <strong>Tip:</strong> Select the <em>Cursor</em> tab to see the detailed skill documentation.
+        <strong>Tip:</strong> Select the <em>Agent SKILLS</em> tab to see the detailed skill documentation.
     </div>
 </div>
 
 <div id="cursor" class="tab-panel">
-    <h3>Cursor Resources</h3>
-    <p>My commands and prompts for Cursor</p>
+    <h3>Agent SKILLS Resources</h3>
     
-    <RemoteFileViewer url="https://raw.githubusercontent.com/mathur-exe/annotation-notes/main/PaperNotes/dotfiles/codex/skills/ask-questions-if-underspecified/SKILL.md" />
+    <div class="viewer-container">
+        <RemoteFileViewer url="https://raw.githubusercontent.com/mathur-exe/annotation-notes/main/PaperNotes/dotfiles/codex/skills/ask-questions-if-underspecified/SKILL.md" />
+    </div>
+
 </div>
 
+
 <div id="codex" class="tab-panel">
-    <h3>Codex CLI Resources</h3>
-    <p>Command line interface tools and configuration.</p>
+    <h3>Cursor slash-commands Resources</h3>
     <pre><code>coming soon...</code></pre>
 </div>

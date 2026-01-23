@@ -13,11 +13,36 @@ export async function getStaticPaths() {
 
 const post = Astro.props;
 const { Content } = await post.render();
+
+// Specific logic for useful-prompts dynamic skills attached to 'cursor' tab
+let computedTabs = post.data.tabs ? JSON.parse(JSON.stringify(post.data.tabs)) : [];
+
+if (post.slug === 'useful-prompts') {
+    const cursorTab = computedTabs.find((t: any) => t.id === 'cursor');
+    if (cursorTab) {
+         try {
+            const res = await fetch('https://api.github.com/repos/mathur-exe/annotation-notes/contents/PaperNotes/dotfiles/codex/skills');
+            
+            if (res.ok) {
+                const data = await res.json();
+                const skills = data
+                    .filter((item: any) => item.type === 'dir')
+                    .map((item: any) => ({
+                        label: item.name,
+                        url: `https://raw.githubusercontent.com/mathur-exe/annotation-notes/main/${item.path}/SKILL.md`
+                    }));
+                cursorTab.items = skills;
+            }
+        } catch (e) {
+            console.error("Failed to fetch skills for useful-prompts", e);
+        }
+    }
+}
 ---
 
 {
     post.data.layoutType === 'council' ? (
-        <CouncilLayout title={post.data.title} tabs={post.data.tabs}>
+        <CouncilLayout title={post.data.title} tabs={computedTabs}>
             <Content />
         </CouncilLayout>
     ) : (
