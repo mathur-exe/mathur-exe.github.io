@@ -22,8 +22,12 @@ let error = '';
 
 if (match) {
   const [_, owner, repo, branch, path] = match;
-  displayPath = `${repo} / ${path}`;
-  repoLink = `https://github.com/${owner}/${repo}`;
+  // Show relative path after the base skills directory
+  const baseDir = 'PaperNotes/dotfiles/codex/';
+  const relativePath = path.startsWith(baseDir) ? path.slice(baseDir.length) : path;
+  displayPath = relativePath;
+  // Link to the actual file on GitHub (not just the repo)
+  repoLink = `https://github.com/${owner}/${repo}/blob/${branch}/${path}`;
   
   try {
     // 1. Fetch Raw Content
@@ -36,11 +40,17 @@ if (match) {
     }
 
     // 2. Fetch Commit Metadata (Last commit for this file)
-    // Rate limits apply: 60/hr for unauthenticated.
+    // Using PAT for higher rate limits (5000/hr vs 60/hr unauthenticated)
+    const githubToken = process.env.GITHUB_MCP_PAT || import.meta.env.GITHUB_MCP_PAT;
+    const apiHeaders: HeadersInit = {
+        'User-Agent': 'Astro-Personal-Site'
+    };
+    if (githubToken) {
+        apiHeaders['Authorization'] = `token ${githubToken}`;
+    }
+    
     const apiRes = await fetch(`https://api.github.com/repos/${owner}/${repo}/commits?path=${path}&per_page=1`, {
-        headers: {
-            'User-Agent': 'Astro-Personal-Site'
-        }
+        headers: apiHeaders
     });
     
     if (apiRes.ok) {
@@ -74,15 +84,12 @@ if (match) {
   ) : (
       <>
         <div class="gist-header">
-            <div class="meta-row top">
-                <a href={repoLink} target="_blank" class="repo-link">{displayPath}</a>
-                {/* Removed stars/forks as requested */}
+            <div class="header-top">
+                <a href={repoLink} target="_blank" rel="noopener noreferrer" class="file-path">{displayPath}</a>
+                {lastUpdated && <span class="last-updated">{lastUpdated}</span>}
             </div>
-            <div class="meta-row bottom">
-                <div class="commit-info">
-                    <span class="commit-msg">{commitMessage}</span>
-                </div>
-                {lastUpdated && <span class="last-updated">Active {lastUpdated}</span>}
+            <div class="commit-row">
+                <span class="commit-msg">{commitMessage}</span>
             </div>
         </div>
         
@@ -95,74 +102,100 @@ if (match) {
 
 <style>
   .gist-viewer {
-    border: 1px solid #30363d;
-    border-radius: 6px;
-    background: #0d1117;
+    border: 1px solid #333;
+    border-radius: 8px;
+    background: #141414;
     overflow: hidden;
-    margin-top: 1rem;
-    max-width: 652px; /* Restricted width as requested */
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    display: flex;
+    flex-direction: column;
+    max-height: 60vh;
   }
 
   .gist-header {
-    background: #0d1117;
-    padding: 1rem;
-    border-bottom: 1px solid #30363d;
+    background: #1a1a1a;
+    padding: 0.5rem 1rem;
+    border-bottom: 1px solid #333;
     display: flex;
     flex-direction: column;
+    gap: 0.25rem;
+    flex-shrink: 0;
+  }
+
+  .header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     gap: 0.5rem;
   }
 
-  .meta-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: baseline;
+  .file-path {
+    font-size: 0.75rem;
+    color: #666;
+    text-decoration: none;
+    font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
-  /* Row 1: File Path */
-  .repo-link {
-      color: #58a6ff;
-      font-weight: 600;
-      text-decoration: none;
-      font-size: 0.9rem;
-  }
-  .repo-link:hover {
-      text-decoration: underline;
+  .file-path:hover {
+    color: #888;
   }
 
-  /* Row 2: Commit & Date */
-  .meta-row.bottom {
-      font-size: 0.8rem;
-      color: #8b949e;
-      margin-top: 4px;
-      font-family: monospace; 
+  .last-updated {
+    font-size: 0.75rem;
+    color: #666;
+    white-space: nowrap;
+    flex-shrink: 0;
   }
 
-  .commit-msg {
-      color: #c9d1d9;
-      margin-right: 1rem;
+  .commit-row {
+    display: none;
   }
 
-  /* Code Area */
+  /* Code Area - scrollable */
   .gist-code {
-      background: #0d1117;
-      overflow-x: auto;
+    background: #141414;
+    overflow: auto;
+    flex: 1;
+    min-height: 0;
   }
 
-  /* Override Astro Code styles to be seamless */
+  /* Override Astro Code styles to match reference site */
   :global(.gist-code pre) {
-      margin: 0 !important;
-      padding: 1rem !important;
-      border: none !important;
-      background: transparent !important;
-      border-radius: 0 !important;
-      font-size: 0.85rem !important;
-      line-height: 1.5 !important;
+    margin: 0 !important;
+    padding: 1rem !important;
+    border: none !important;
+    background: #141414 !important;
+    border-radius: 0 !important;
+    font-size: 0.875rem !important;
+    line-height: 1.6 !important;
+    white-space: pre-wrap !important;
+    word-wrap: break-word !important;
+    overflow-wrap: break-word !important;
+    color: #999 !important;
+  }
+
+  :global(.gist-code code) {
+    color: #999 !important;
+    white-space: pre-wrap !important;
+    word-wrap: break-word !important;
+    font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace !important;
+  }
+
+  /* Remove syntax highlighting colors - use single muted color */
+  :global(.gist-code .line) {
+    color: #999 !important;
+  }
+  
+  :global(.gist-code span) {
+    color: inherit !important;
   }
 
   .error-msg {
-      padding: 1rem;
-      color: #f85149;
-      font-family: monospace;
+    padding: 1rem;
+    color: #f85149;
+    font-family: monospace;
   }
 </style>

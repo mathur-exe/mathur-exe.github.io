@@ -21,7 +21,15 @@ if (post.slug === 'useful-prompts') {
     const cursorTab = computedTabs.find((t: any) => t.id === 'cursor');
     if (cursorTab) {
          try {
-            const res = await fetch('https://api.github.com/repos/mathur-exe/annotation-notes/contents/PaperNotes/dotfiles/codex/skills');
+            const githubToken = process.env.GITHUB_MCP_PAT || import.meta.env.GITHUB_MCP_PAT;
+            const headers: HeadersInit = {
+                'User-Agent': 'Astro-Personal-Site'
+            };
+            if (githubToken) {
+                headers['Authorization'] = `token ${githubToken}`;
+            }
+            
+            const res = await fetch('https://api.github.com/repos/mathur-exe/annotation-notes/contents/PaperNotes/dotfiles/codex/skills', { headers });
             
             if (res.ok) {
                 const data = await res.json();
@@ -42,7 +50,7 @@ if (post.slug === 'useful-prompts') {
 
 {
     post.data.layoutType === 'council' ? (
-        <CouncilLayout title={post.data.title} tabs={computedTabs}>
+        <CouncilLayout title={post.data.title} description={post.data.description} tabs={computedTabs}>
             <Content />
         </CouncilLayout>
     ) : (

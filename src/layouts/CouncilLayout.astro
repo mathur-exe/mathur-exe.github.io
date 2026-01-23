@@ -3,14 +3,22 @@ import '../styles/global.css';
 
 interface Props {
 	title: string;
+	description?: string;
 	tabs?: { 
         label: string; 
         id: string;
-        items?: { label: string; url?: string; }[]; // Updated to object with url support
+        items?: { label: string; url?: string; description?: string; }[]; // Updated with description support
     }[];
 }
 
-const { title, tabs = [] } = Astro.props;
+const { title, description = '', tabs = [] } = Astro.props;
+
+// Find the default active skill for header display
+const defaultSkill = tabs.find(t => t.items?.length)?.items?.find(i => 
+    (typeof i !== 'string' && i.label === 'ask-questions-if-underspecified')
+) || tabs.find(t => t.items?.length)?.items?.[0];
+
+const defaultSkillLabel = typeof defaultSkill === 'string' ? defaultSkill : defaultSkill?.label || '';
 ---
 
 <!doctype html>
@@ -26,351 +34,478 @@ const { title, tabs = [] } = Astro.props;
 		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" integrity="sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI+WdtXRGWt2kTvGFasHpSy3SV" crossorigin="anonymous">
 	</head>
 	<body>
-		<div class="council-layout">
-			<!-- Sidebar -->
-			<aside class="sidebar">
-				<div class="sidebar-header">
-					<a href="/" class="home-link">← mathur.exe</a>
-				</div>
-                
-                {tabs.length > 0 && (
-                    <nav class="tabs-nav">
-                        {tabs.map((tab, index) => (
-                            <div class="nav-group">
-                                <button 
-                                    class={`tab-btn ${index === 0 ? 'active' : ''}`} 
-                                    data-target={tab.id}
-                                >
-                                    {tab.label}
-                                </button>
-                                
-                                {tab.items && tab.items.length > 0 && (
-                                    <ul class="sub-menu">
-                                        {tab.items.map(item => (
-                                            <li class="skill-item" data-repo-url={typeof item === 'string' ? undefined : item.url}>
-                                                {typeof item === 'string' ? item : item.label}
-                                            </li>
-                                        ))}
-                                    </ul>
-                                )}
-                            </div>
-                        ))}
-                    </nav>
-                )}
-				
-				<div class="separator"></div>
-                
-                <div class="usage-tip">
-                    <p>Send ideas to <a href="#">@mathur_exe</a></p>
-                </div>
+		<div class="page-container">
+			<!-- Back Button (separate from content) -->
+			<div class="back-nav">
+				<a href="/" class="back-link">← Back</a>
+			</div>
 
-			</aside>
+			<!-- Page Header -->
+			<div class="page-header">
+				<h1 class="page-title">{title}</h1>
+				{description && <p class="page-description">{description}</p>}
+			</div>
 
-			<!-- Main Content -->
-			<main class="main-content">
-				<slot />
-			</main>
+			<div class="council-layout">
+				<!-- Sidebar -->
+				<aside class="sidebar">
+					{tabs.length > 0 && (
+						<nav class="tabs-nav">
+							{tabs.map((tab, index) => (
+								<div class="nav-group" data-panel-id={tab.id}>
+									{tab.items && tab.items.length > 0 ? (
+										<>
+											<p class="section-title">{tab.label.toUpperCase()}</p>
+											<ul class="sub-menu">
+												{tab.items.map((item) => {
+													const label = typeof item === 'string' ? item : item.label;
+													const isDefault = label === 'ask-questions-if-underspecified';
+													const itemUrl = typeof item === 'string' ? '' : item.url || '';
+													const itemDesc = typeof item === 'string' ? '' : item.description || '';
+													return (
+														<li 
+															class={`skill-item ${isDefault ? 'active' : ''}`} 
+															data-repo-url={itemUrl}
+															data-panel-id={tab.id}
+															data-skill-desc={itemDesc}
+														>
+															{label}
+														</li>
+													);
+												})}
+											</ul>
+										</>
+									) : (
+										<p class="section-title section-link" data-target={tab.id}>{tab.label.toUpperCase()}</p>
+									)}
+								</div>
+							))}
+						</nav>
+					)}
+					
+					<div class="usage-tip">
+						<p>Send ideas to <a href="https://twitter.com/mathur_exe" target="_blank">@mathur_exe</a></p>
+					</div>
+				</aside>
+
+				<!-- Main Content -->
+				<main class="main-content">
+					<!-- Skill Header (shown above RemoteViewer) -->
+					<div class="skill-header" id="skill-header">
+						<h2 class="skill-name"><code id="skill-name-code">{defaultSkillLabel}</code></h2>
+						<p class="skill-description" id="skill-description">Loading description...</p>
+					</div>
+					<slot />
+				</main>
+			</div>
 		</div>
 
 		<script>
 			// Vanilla JS Tab Switching & Dynamic Viewer
 			document.addEventListener('DOMContentLoaded', () => {
-				const buttons = document.querySelectorAll('.tab-btn');
 				const panels = document.querySelectorAll('.tab-panel');
+				const sectionLinks = document.querySelectorAll('.section-link');
+				const skillHeader = document.getElementById('skill-header');
+				const skillNameEl = document.getElementById('skill-name-code');
+				const skillDescEl = document.getElementById('skill-description');
 
-				// Init: hide all except first (or active)
-                if (panels.length > 0) {
-                    panels.forEach((p, i) => {
-                         if (i === 0) p.style.display = 'block';
-                         else p.style.display = 'none';
-                    });
-                }
+				// Init: show the first panel (Agent SKILLS / cursor)
+				if (panels.length > 0) {
+					panels.forEach((p, i) => {
+						if (i === 0) p.style.display = 'block';
+						else p.style.display = 'none';
+					});
+				}
 
-				buttons.forEach(btn => {
-					btn.addEventListener('click', () => {
-						buttons.forEach(b => b.classList.remove('active'));
-						btn.classList.add('active');
+				// Handle section-link clicks (for tabs without items like ChatGPT/Gemini)
+				sectionLinks.forEach(link => {
+					link.addEventListener('click', () => {
 						panels.forEach(p => (p as HTMLElement).style.display = 'none');
-						const targetId = btn.getAttribute('data-target');
+						const targetId = link.getAttribute('data-target');
 						const targetPanel = document.getElementById(targetId || '');
 						if (targetPanel) {
 							targetPanel.style.display = 'block';
 						}
+						document.querySelectorAll('.skill-item').forEach(s => s.classList.remove('active'));
+						// Hide skill header for non-skill panels
+						if (skillHeader) skillHeader.style.display = 'none';
 					});
 				});
 
-                // --- Dynamic Skill Viewer Logic ---
-                const skillButtons = document.querySelectorAll('.skill-item');
-                const viewerContainer = document.querySelector('.viewer-container');
-                
-                async function updateViewer(url) {
-                    if (!viewerContainer) return;
+				// --- Dynamic Skill Viewer Logic ---
+				const skillButtons = document.querySelectorAll('.skill-item');
+				const viewerContainer = document.querySelector('.viewer-container');
+				const gistViewer = viewerContainer?.querySelector('.gist-viewer');
 
-                    const match = url.match(/raw\.githubusercontent\.com\/([^/]+)\/([^/]+)\/([^/]+)\/(.+)/);
-                    if (!match) return;
-                    const [_, owner, repo, branch, path] = match;
-                    
-                    const codeBlock = viewerContainer.querySelector('code');
-                    if (codeBlock) codeBlock.innerText = "Loading...";
+				// Parse SKILL.md frontmatter for description
+				function parseSkillDescription(content: string): string {
+					const frontmatterMatch = content.match(/^---\s*\n([\s\S]*?)\n---/);
+					if (frontmatterMatch) {
+						const frontmatter = frontmatterMatch[1];
+						const descMatch = frontmatter.match(/description:\s*(.+)/);
+						if (descMatch) {
+							return descMatch[1].trim().replace(/^['"]|['"]$/g, '');
+						}
+					}
+					return 'No description available';
+				}
 
-                    try {
-                        const contentRes = await fetch(url);
-                        const fileContent = await contentRes.text();
+				// Get relative path from URL (after base directory)
+				function getRelativePath(fullPath: string): string {
+					const baseDir = 'PaperNotes/dotfiles/codex/';
+					return fullPath.startsWith(baseDir) ? fullPath.slice(baseDir.length) : fullPath;
+				}
 
-                        const apiRes = await fetch(`https://api.github.com/repos/${owner}/${repo}/commits?path=${path}&per_page=1`);
-                        let commitMsg = "Commit info unavailable";
-                        let timeAgo = "";
-                        
-                        if (apiRes.ok) {
-                            const commits = await apiRes.json();
-                            if (commits.length > 0) {
-                                commitMsg = commits[0].commit.message.split('\n')[0];
-                                const date = new Date(commits[0].commit.author.date);
-                                const diff = (new Date().getTime() - date.getTime()) / 1000;
-                                if (diff < 60) timeAgo = 'just now';
-                                else if (diff < 3600) timeAgo = `${Math.floor(diff / 60)} minutes ago`;
-                                else if (diff < 86400) timeAgo = `${Math.floor(diff / 3600)} hours ago`;
-                                else timeAgo = date.toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' });
-                            }
-                        }
+				async function updateViewer(url: string, skillName: string) {
+					if (!viewerContainer || !gistViewer) {
+						console.error('Viewer container not found');
+						return;
+					}
 
-                        const linkEl = viewerContainer.querySelector('.repo-link');
-                        const msgEl = viewerContainer.querySelector('.commit-msg');
-                        const timeEl = viewerContainer.querySelector('.last-updated');
-                        const codeEl = viewerContainer.querySelector('code');
+					const match = url.match(/raw\.githubusercontent\.com\/([^/]+)\/([^/]+)\/([^/]+)\/(.+)/);
+					if (!match) {
+						console.error('Invalid URL format');
+						return;
+					}
+					const [_, owner, repo, branch, path] = match;
 
-                        if (linkEl) {
-                            (linkEl as HTMLAnchorElement).href = `https://github.com/${owner}/${repo}`;
-                            (linkEl as HTMLElement).innerText = `${repo} / ${path}`;
-                        }
-                        if (msgEl) (msgEl as HTMLElement).innerText = commitMsg;
-                        if (timeEl) (timeEl as HTMLElement).innerText = `Active ${timeAgo}`;
-                        if (codeEl) codeEl.textContent = fileContent;
+					// Update skill header immediately
+					if (skillNameEl) skillNameEl.textContent = skillName;
+					if (skillHeader) skillHeader.style.display = 'block';
 
-                    } catch (e) {
-                        console.error("Viewer update failed", e);
-                    }
-                }
+					// Show loading state
+					const codeBlock = gistViewer.querySelector('.gist-code pre code') || gistViewer.querySelector('.gist-code pre');
+					if (codeBlock) codeBlock.textContent = "Loading...";
+					if (skillDescEl) skillDescEl.textContent = "Loading...";
 
-                skillButtons.forEach(btn => {
-                    btn.addEventListener('click', (e) => {
-                        e.stopPropagation(); 
-                        const url = btn.getAttribute('data-repo-url');
-                        if (url) {
-                            skillButtons.forEach(b => b.classList.remove('active'));
-                            btn.classList.add('active');
-                            updateViewer(url);
-                        }
-                    });
-                });
+					try {
+						// Fetch file content
+						const contentRes = await fetch(url);
+						const fileContent = await contentRes.text();
+
+						// Parse and update skill description from frontmatter
+						const skillDescription = parseSkillDescription(fileContent);
+						if (skillDescEl) skillDescEl.textContent = skillDescription;
+
+						// Fetch commit metadata
+						const apiRes = await fetch(`https://api.github.com/repos/${owner}/${repo}/commits?path=${path}&per_page=1`);
+						let commitMsg = "Commit info unavailable";
+						let timeAgo = "";
+
+						if (apiRes.ok) {
+							const commits = await apiRes.json();
+							if (commits.length > 0) {
+								commitMsg = commits[0].commit.message.split('\n')[0];
+								const date = new Date(commits[0].commit.author.date);
+								const diff = (new Date().getTime() - date.getTime()) / 1000;
+								if (diff < 60) timeAgo = 'just now';
+								else if (diff < 3600) timeAgo = `${Math.floor(diff / 60)} minutes ago`;
+								else if (diff < 86400) timeAgo = `${Math.floor(diff / 3600)} hours ago`;
+								else timeAgo = date.toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' });
+							}
+						}
+
+						// Update DOM elements
+						const displayPath = getRelativePath(path);
+						const fileLink = `https://github.com/${owner}/${repo}/blob/${branch}/${path}`;
+
+						const filePathEl = gistViewer.querySelector('.file-path') as HTMLAnchorElement;
+						const timeEl = gistViewer.querySelector('.last-updated') as HTMLElement;
+						const commitMsgEl = gistViewer.querySelector('.commit-msg') as HTMLElement;
+						const codeEl = gistViewer.querySelector('.gist-code pre code') || gistViewer.querySelector('.gist-code pre');
+
+						if (filePathEl) {
+							filePathEl.textContent = displayPath;
+							filePathEl.href = fileLink;
+						}
+						if (timeEl) timeEl.textContent = timeAgo;
+						if (commitMsgEl) commitMsgEl.textContent = commitMsg;
+						if (codeEl) codeEl.textContent = fileContent;
+
+					} catch (e) {
+						console.error("Viewer update failed", e);
+					}
+				}
+
+				skillButtons.forEach(btn => {
+					btn.addEventListener('click', (e) => {
+						e.stopPropagation();
+						e.preventDefault();
+						const url = btn.getAttribute('data-repo-url');
+						const panelId = btn.getAttribute('data-panel-id');
+						const skillName = btn.textContent?.trim() || '';
+
+						// Show the corresponding panel
+						if (panelId) {
+							panels.forEach(p => (p as HTMLElement).style.display = 'none');
+							const targetPanel = document.getElementById(panelId);
+							if (targetPanel) {
+								targetPanel.style.display = 'block';
+							}
+						}
+
+						if (url) {
+							skillButtons.forEach(b => b.classList.remove('active'));
+							btn.classList.add('active');
+							updateViewer(url, skillName);
+						}
+					});
+				});
+
+				// Auto-load the default active skill on page load
+				const activeSkill = document.querySelector('.skill-item.active') as HTMLElement;
+				if (activeSkill) {
+					const url = activeSkill.getAttribute('data-repo-url');
+					const skillName = activeSkill.textContent?.trim() || '';
+					if (url) {
+						updateViewer(url, skillName);
+					}
+				}
 			});
 		</script>
 
 		<style>
 			/* Council Layout Specific Styles */
 			:root {
-				--sidebar-width: 176px; /* w-44 */
-                --sidebar-bg: transparent;
-                --sidebar-text: #888;
-                --sidebar-text-active: #fff;
-                --main-bg: #0d0d0d;
-                --border-color: #333;
+				--sidebar-width: 176px;
+				--sidebar-bg: transparent;
+				--sidebar-text: #888;
+				--sidebar-text-active: #fff;
+				--main-bg: #0d0d0d;
+				--border-color: #333;
+				--surface-secondary: #1a1a1a;
 			}
 
-            body {
-                background-color: var(--main-bg);
-                color: #e0e0e0;
-                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-                margin: 0;
-                overflow: hidden; /* App-like */
-                height: 100vh;
-            }
+			body {
+				background-color: var(--main-bg);
+				color: #e0e0e0;
+				font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+				margin: 0;
+				min-height: 100vh;
+				overflow-y: auto;
+			}
+
+			.page-container {
+				max-width: 900px;
+				margin: 0 auto;
+				padding: 2rem;
+			}
+
+			/* Back Navigation */
+			.back-nav {
+				margin-bottom: 2rem;
+			}
+
+			.back-link {
+				color: var(--sidebar-text);
+				text-decoration: none;
+				font-size: 0.9rem;
+				transition: color 0.15s ease;
+			}
+
+			.back-link:hover {
+				color: var(--sidebar-text-active);
+			}
+
+			/* Page Header */
+			.page-header {
+				margin-bottom: 2rem;
+			}
+
+			.page-title {
+				font-size: 1.5rem;
+				font-weight: 500;
+				color: var(--sidebar-text-active);
+				margin: 0 0 0.25rem 0;
+			}
+
+			.page-description {
+				font-size: 1rem;
+				color: var(--sidebar-text);
+				margin: 0;
+			}
 
 			.council-layout {
 				display: flex;
-                flex-direction: row;
-                align-items: flex-start;
-                gap: 24px;
-                padding: 0;
-                max-width: 1200px;
-                margin: 0 auto;
-                padding-top: 2rem;
+				flex-direction: row;
+				align-items: flex-start;
+				gap: 1.5rem;
 			}
 
 			/* Sidebar */
 			.sidebar {
-                width: var(--sidebar-width);
-                flex: 0 0 auto;
+				width: var(--sidebar-width);
+				flex: 0 0 auto;
 				background-color: var(--sidebar-bg);
-				padding: 0;
-                /* Optional: internal padding if needed, but reference had gap handling separation */
+				padding-right: 1.5rem;
 				display: flex;
 				flex-direction: column;
 			}
 
-            .sidebar-header {
-                margin-bottom: 2rem;
-            }
-            .home-link {
-                color: var(--sidebar-text-active);
-                text-decoration: none;
-                font-size: 0.9rem;
-                font-weight: 500;
-            }
-
 			.section-title {
-				font-size: 0.75rem;
+				font-size: 0.7rem;
 				text-transform: uppercase;
-				letter-spacing: 0.05em;
-				color: #555;
-				margin-bottom: 1rem;
+				letter-spacing: 0.1em;
+				color: #666;
+				margin-bottom: 0.75rem;
 				font-weight: 600;
+				margin-top: 0;
 			}
 
-            .tabs-nav {
-                display: flex;
-                flex-direction: column;
-                gap: 1.5rem;
-                margin-bottom: 2rem;
-            }
+			.section-link {
+				cursor: pointer;
+				transition: color 0.15s ease;
+				padding: 0.5rem 0;
+			}
 
-            .nav-group {
-                display: flex;
-                flex-direction: column;
-                gap: 0.5rem;
-            }
+			.section-link:hover {
+				color: #999;
+			}
 
-            .tab-btn {
-                background: none;
-                border: none;
-                text-align: left;
-                color: var(--sidebar-text);
-                padding: 0.5rem 0.75rem;
-                border-radius: 6px;
-                cursor: pointer;
-                font-size: 0.95rem; /* Slightly larger for main headers */
-                transition: all 0.2s;
-                font-weight: 500;
-            }
+			.tabs-nav {
+				display: flex;
+				flex-direction: column;
+				gap: 1.5rem;
+				margin-bottom: 2rem;
+			}
 
-            .tab-btn:hover {
-                color: var(--sidebar-text-active);
-            }
-
-            .tab-btn.active {
-                color: var(--sidebar-text-active);
-            }
+			.nav-group {
+				display: flex;
+				flex-direction: column;
+				gap: 0.5rem;
+			}
 
 			.sub-menu {
 				list-style: none;
 				padding: 0;
-                padding-left: 1rem;
 				margin: 0;
-                display: flex;
-                flex-direction: column;
-                gap: 0.5rem;
+				display: flex;
+				flex-direction: column;
+				gap: 0.25rem;
 			}
-            
-            .sub-menu li {
-                color: #666; /* Dimmer than main labels */
-                font-family: "Fira Code", monospace;
-                font-size: 0.85rem;
-                cursor: pointer;
-                padding: 0.2rem 0.5rem;
-                border-radius: 4px;
-                transition: color 0.2s;
-            }
-            .sub-menu li:hover {
-                color: var(--sidebar-text-active);
-                background: rgba(255,255,255,0.03);
-            }
 
-            .separator {
-                height: 1px;
-                background-color: var(--border-color);
-                margin: 2rem 0;
-            }
-            
-            .usage-tip {
-                margin-top: auto;
-                font-size: 0.85rem;
-                color: var(--sidebar-text);
-            }
-            .usage-tip a {
-                color: var(--sidebar-text);
-                text-decoration: none;
-            }
+			.sub-menu li {
+				color: #999;
+				font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+				font-size: 0.875rem;
+				cursor: pointer;
+				padding: 0.5rem 0.75rem;
+				border-radius: 6px;
+				border: 1px solid transparent;
+				transition: all 0.15s ease;
+				white-space: nowrap;
+				overflow: hidden;
+				text-overflow: ellipsis;
+			}
+
+			.sub-menu li:hover {
+				color: #ccc;
+				background: #1f1f1f;
+			}
+
+			.sub-menu li.active {
+				color: #eee;
+				background: var(--surface-secondary);
+				border-color: var(--border-color);
+			}
+
+			.usage-tip {
+				margin-top: 2rem;
+				font-size: 0.85rem;
+				color: var(--sidebar-text);
+			}
+
+			.usage-tip a {
+				color: var(--sidebar-text);
+				text-decoration: none;
+			}
+
+			.usage-tip a:hover {
+				color: var(--sidebar-text-active);
+			}
 
 			/* Main Content */
 			.main-content {
-				background-color: transparent;
-                flex: 1;
-                min-width: 0; /* Important for flex child truncation */
-                position: relative;
+				flex: 1;
+				min-width: 0;
+				display: flex;
+				flex-direction: column;
 			}
 
-            /* Global overrides for this view */
-            :global(h1) {
-                color: #fff;
-                font-size: 1.8rem;
-                margin-top: 2rem;
-            }
-            :global(p) {
-                color: #ccc;
-            }
-            :global(pre) {
-                background: #1a1a1a !important;
-                border: 1px solid #333;
-            }
+			/* Skill Header (above RemoteViewer) */
+			.skill-header {
+				margin-bottom: 1rem;
+			}
 
-            @media (max-width: 768px) {
-                .council-layout {
-                    grid-template-columns: 1fr;
-                    height: auto;
-                    overflow: visible;
-                }
-                .sidebar {
-                    height: auto;
-                    border-bottom: 1px solid var(--border-color);
-                }
-                body {
-                    overflow: auto;
-                }
-            }
+			.skill-name {
+				font-size: 1.125rem;
+				font-weight: 500;
+				color: var(--sidebar-text-active);
+				margin: 0 0 0.25rem 0;
+				display: flex;
+				align-items: center;
+				gap: 0.5rem;
+			}
 
-            /* Content Styles (moved from MDX) */
-            .tab-panel {
-                padding: 2rem 3rem;
-                max-width: 900px;
-                margin: 0 auto;
-                animation: fadeIn 0.3s ease;
-            }
-            
-            .tab-panel h3 {
-                font-size: 1.5rem;
-                color: #fff;
-                margin-bottom: 0.5rem;
-                border-bottom: 1px solid #333;
-                padding-bottom: 1rem;
-            }
-            
-            .tab-panel p {
-                color: #888;
-                margin-bottom: 2rem;
-            }
+			.skill-name code {
+				padding: 0.25rem 0.5rem;
+				background: var(--surface-secondary);
+				border: 1px solid var(--border-color);
+				border-radius: 4px;
+				font-size: 1rem;
+				font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+			}
 
-            .note-card {
-                background: rgba(255,255,255,0.05);
-                border: 1px solid #333;
-                padding: 1rem;
-                border-radius: 6px;
-                color: #ccc;
-            }
+			.skill-description {
+				font-size: 0.875rem;
+				color: var(--sidebar-text);
+				margin: 0;
+			}
 
-            @keyframes fadeIn {
-                from { opacity: 0; transform: translateY(5px); }
-                to { opacity: 1; transform: translateY(0); }
-            }
+			/* Content Styles */
+			.tab-panel {
+				animation: fadeIn 0.3s ease;
+			}
+
+			.tab-panel h3 {
+				font-size: 1.5rem;
+				color: #fff;
+				margin-bottom: 0.5rem;
+				border-bottom: 1px solid #333;
+				padding-bottom: 1rem;
+			}
+
+			.tab-panel p {
+				color: #888;
+				margin-bottom: 2rem;
+			}
+
+			.note-card {
+				background: rgba(255,255,255,0.05);
+				border: 1px solid #333;
+				padding: 1rem;
+				border-radius: 6px;
+				color: #ccc;
+			}
+
+			@keyframes fadeIn {
+				from { opacity: 0; transform: translateY(5px); }
+				to { opacity: 1; transform: translateY(0); }
+			}
+
+			@media (max-width: 768px) {
+				.council-layout {
+					flex-direction: column;
+				}
+
+				.sidebar {
+					width: 100%;
+					padding-right: 0;
+					border-bottom: 1px solid var(--border-color);
+					padding-bottom: 1rem;
+					margin-bottom: 1rem;
+				}
+			}
 		</style>
 	</body>
 </html>
