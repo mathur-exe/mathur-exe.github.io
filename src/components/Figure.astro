@@ -1,0 +1,93 @@
+---
+interface Props {
+  src?: string;
+  src2?: string;
+  caption?: string;
+  wide?: boolean;
+  width?: string;
+  height?: string;
+  maxWidth?: string;
+  maxHeight?: string;
+}
+
+const { src, src2, caption, wide = false, width, height, maxWidth, maxHeight } = Astro.props;
+
+// Build inline style for images
+const imgStyle = [
+  width && `width: ${width}`,
+  height && `height: ${height}`,
+  maxWidth && `max-width: ${maxWidth}`,
+  maxHeight && `max-height: ${maxHeight}`,
+].filter(Boolean).join('; ');
+---
+
+<figure class:list={['figure', { 'wide': wide, 'dual': !!src2 }]}>
+  <div class="image-container">
+    {src && <img src={src} alt={caption || ''} style={imgStyle || undefined} />}
+    {src2 && <img src={src2} alt={caption || ''} style={imgStyle || undefined} />}
+  </div>
+  {caption && <figcaption>{caption}</figcaption>}
+</figure>
+
+<style>
+  .figure {
+    margin: 2rem 0;
+    
+    /* Break out of any parent nesting (lists, indentations) */
+    width: 100vw;
+    position: relative;
+    left: 50%;
+    margin-left: -50vw;
+    
+    /* Center the inner content */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .image-container {
+    width: 100%;
+    /* Standard width matches the text column */
+    max-width: var(--text-column-width, 660px);
+    display: flex;
+    gap: 1rem;
+    padding: 0 1rem; /* Safety padding for mobile */
+    box-sizing: border-box;
+  }
+
+  .image-container img {
+    /* Flex 1 guarantees equal width for dual images */
+    flex: 1;
+    /* Ensure they don't exceed their natural size if single? No, stretch to fill */
+    width: 100%;
+    height: auto;
+    border-radius: 4px;
+    object-fit: cover;
+  }
+
+  /* Wide variant: Allow wider container */
+  .figure.wide .image-container {
+    max-width: var(--container-max-width, 990px);
+  }
+
+  /* Dual images: Ensure they share space equally even if small */
+  .figure.dual .image-container img {
+    min-width: 0; /* Fix flex overflow issues */
+  }
+
+  figcaption {
+    margin-top: 0.75rem;
+    font-size: 0.9rem;
+    color: var(--meta-color, #666);
+    text-align: center;
+    line-height: 1.4;
+    max-width: var(--text-column-width, 660px); /* Keep caption readable width */
+  }
+
+  /* Mobile responsiveness */
+  @media (max-width: 768px) {
+    .image-container {
+      flex-direction: column; /* Stack dual images on mobile */
+    }
+  }
+</style>

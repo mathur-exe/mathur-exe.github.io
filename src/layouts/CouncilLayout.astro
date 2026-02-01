@@ -4,14 +4,15 @@ import '../styles/global.css';
 interface Props {
 	title: string;
 	description?: string;
+	heroImage?: string;
 	tabs?: { 
         label: string; 
         id: string;
-        items?: { label: string; url?: string; description?: string; }[]; // Updated with description support
+        items?: { label: string; url?: string; description?: string; }[];
     }[];
 }
 
-const { title, description = '', tabs = [] } = Astro.props;
+const { title, description = '', heroImage, tabs = [] } = Astro.props;
 
 // Find the default active skill for header display
 const defaultSkill = tabs.find(t => t.items?.length)?.items?.find(i => 
@@ -44,6 +45,9 @@ const defaultSkillLabel = typeof defaultSkill === 'string' ? defaultSkill : defa
 			<div class="page-header">
 				<h1 class="page-title">{title}</h1>
 				{description && <p class="page-description">{description}</p>}
+				{heroImage && (
+					<img src={heroImage} alt={title} class="hero-image" />
+				)}
 			</div>
 
 			<div class="council-layout">
@@ -323,6 +327,15 @@ const defaultSkillLabel = typeof defaultSkill === 'string' ? defaultSkill : defa
 				font-size: 1rem;
 				color: var(--sidebar-text);
 				margin: 0;
+			}
+
+			.hero-image {
+				display: block;
+				max-width: 100%;
+				height: auto;
+				margin: 1.5rem auto 0 auto;
+				border-radius: 8px;
+				border: 1px solid var(--border-color);
 			}
 
 			.council-layout {

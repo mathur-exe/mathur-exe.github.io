@@ -50,7 +50,7 @@ if (post.slug === 'useful-prompts') {
 
 {
     post.data.layoutType === 'council' ? (
-        <CouncilLayout title={post.data.title} description={post.data.description} tabs={computedTabs}>
+        <CouncilLayout title={post.data.title} description={post.data.description} heroImage={post.data.heroImage} tabs={computedTabs}>
             <Content />
         </CouncilLayout>
     ) : (

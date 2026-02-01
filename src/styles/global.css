@@ -1,13 +1,15 @@
 /* Global CSS: Typography, Reset, and Layout Variables */
 
 :root {
-  /* Thinking Machines inspired palette */
-  --bg-color: #fcfcfc;
-  --text-color: #333;
-  --link-color: #333;
-  --link-hover-color: #000;
-  --meta-color: #666;
-  --border-color: #e0e0e0;
+  /* Shaoruu Dark Theme inspired palette */
+  --bg-color: #151515;
+  --text-color: #eeeeee;
+  --link-color: #eeeeee;
+  --link-hover-color: #ffffff;
+  --meta-color: #a1a1a1;
+  --border-color: #333333;
+  --surface-color: #1a1a1a;
+  --code-bg: #1a1a1a;
 
   /* Layout Dimensions - Exact match for Thinking Machines */
   --container-max-width: 990px;
@@ -41,7 +43,7 @@ h6 {
   font-weight: 600;
   margin-top: 2em;
   margin-bottom: 0.5em;
-  color: #111;
+  color: var(--text-color);
 }
 
 h1 {
@@ -72,7 +74,8 @@ pre,
 code {
   font-family: "Fira Code", "Menlo", monospace;
   font-size: 0.95em;
-  background: #f4f4f4;
+  background: var(--code-bg);
+  color: var(--text-color);
   border-radius: 4px;
 }
 
@@ -162,6 +165,7 @@ article {
     margin: 1em 0;
     padding: 1em;
     background: #f9f9f9;
+    color: var(--text-color);
   }
   */
 }
