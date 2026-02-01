@@ -11,7 +11,7 @@ const blog = defineCollection({
         updatedDate: z.coerce.date().optional(),
         heroImage: z.string().optional(),
         // Layout config
-        layoutType: z.enum(['council']).optional(),
+        layoutType: z.enum(['council', 'wide', 'tml']).optional(),
         tabs: z.array(z.object({
             label: z.string(),
             id: z.string(),

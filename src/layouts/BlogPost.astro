@@ -1,8 +1,14 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 const { frontmatter } = Astro.props;
+
+const layoutClass = frontmatter.layoutType === 'wide'
+  ? 'layout-wide'
+  : frontmatter.layoutType === 'tml'
+    ? 'layout-tml'
+    : undefined;
 ---
-<BaseLayout title={frontmatter.title}>
+<BaseLayout title={frontmatter.title} layoutClass={layoutClass}>
   <article>
     <header style="margin-bottom: 2rem;">
       <h1>{frontmatter.title}</h1>

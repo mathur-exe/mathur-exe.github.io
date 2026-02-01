@@ -1,5 +1,126 @@
 /* Global CSS: Typography, Reset, and Layout Variables */
 
+/* Whitney Font Family for Dynalist-style layout */
+@font-face {
+  font-family: "Whitney";
+  src: url("/fonts/whitney-2/whitneylight.otf") format("opentype");
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Whitney";
+  src: url("/fonts/whitney-2/whitneylightitalic.otf") format("opentype");
+  font-weight: 300;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Whitney";
+  src: url("/fonts/whitney-2/whitneybook.otf") format("opentype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Whitney";
+  src: url("/fonts/whitney-2/whitneybookitalic.otf") format("opentype");
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Whitney";
+  src: url("/fonts/whitney-2/whitneymedium.otf") format("opentype");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Whitney";
+  src: url("/fonts/whitney-2/whitneymediumitalic.otf") format("opentype");
+  font-weight: 500;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Whitney";
+  src: url("/fonts/whitney-2/whitneysemibold.otf") format("opentype");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Whitney";
+  src: url("/fonts/whitney-2/WhitneySemiboldItalic.otf") format("opentype");
+  font-weight: 600;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Whitney";
+  src: url("/fonts/whitney-2/whitneybold.otf") format("opentype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Iowan Old Style BT";
+  src: url("/fonts/iowanoldst-bt/bitstream-iowan-old-style-bt-586c36a8d7712.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Iowan Old Style BT";
+  src: url("/fonts/iowanoldst-bt/bitstream-iowan-old-style-italic-bt-586c3740dc396.ttf") format("truetype");
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Iowan Old Style BT";
+  src: url("/fonts/iowanoldst-bt/bitstream-iowan-old-style-bold-bt-586c371d8d669.ttf") format("truetype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Iowan Old Style BT";
+  src: url("/fonts/iowanoldst-bt/bitstream-iowan-old-style-bold-italic-bt-586c37701cb62.ttf") format("truetype");
+  font-weight: 700;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Iowan Old Style BT";
+  src: url("/fonts/iowanoldst-bt/bitstream-iowan-old-style-black-bt-586c36e930225.ttf") format("truetype");
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Iowan Old Style BT";
+  src: url("/fonts/iowanoldst-bt/bitstream-iowan-old-style-black-italic-bt-586c378f12ca1.ttf") format("truetype");
+  font-weight: 900;
+  font-style: italic;
+  font-display: swap;
+}
+
 :root {
   /* Shaoruu Dark Theme inspired palette */
   --bg-color: #151515;
@@ -14,9 +135,14 @@
   /* Layout Dimensions - Exact match for Thinking Machines */
   --container-max-width: 990px;
   --text-column-width: 660px;
+  --figure-max-width: var(--text-column-width);
   --sidenote-width: 200px;
   --sidenote-outdent: -235px;
   /* Pulls it into the margin */
+
+  /* Typography */
+  --font-body: "Charter", "Bitstream Charter", "Sitka Text", Cambria, serif;
+  --font-heading: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }
 
 * {
@@ -24,7 +150,7 @@
 }
 
 body {
-  font-family: "Charter", "Bitstream Charter", "Sitka Text", Cambria, serif;
+  font-family: var(--font-body);
   background-color: var(--bg-color);
   color: var(--text-color);
   line-height: 1.65;
@@ -39,7 +165,7 @@ h3,
 h4,
 h5,
 h6 {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-family: var(--font-heading);
   font-weight: 600;
   margin-top: 2em;
   margin-bottom: 0.5em;
@@ -87,6 +213,22 @@ blockquote {
   color: var(--meta-color);
 }
 
+/* Dynalist-style highlighting */
+mark,
+.highlight {
+  background-color: #9db83b;
+  color: #000000;
+  padding: 0.1em 0.2em;
+  border-radius: 2px;
+}
+
+/* Support for ==highlight== syntax in Markdown */
+article p mark,
+article li mark {
+  background-color: #9db83b;
+  color: #000000;
+}
+
 /* Margin Note Logic */
 .sidenote {
   float: right;
@@ -103,6 +245,10 @@ blockquote {
   color: var(--meta-color);
   vertical-align: baseline;
   position: relative;
+}
+
+.container.layout-wide .sidenote {
+  display: none;
 }
 
 /* Numbered Sidenotes (optional counter manually managed or auto-increment styles) */
@@ -125,6 +271,73 @@ blockquote {
   margin: 0 auto;
   padding: 0 16px;
   position: relative;
+}
+
+/* Layout-wide Dynalist-style theme */
+body:has(.container.layout-wide) {
+  background-color: #181818;
+  font-family: "Whitney", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-size: 16px;
+  line-height: 1.375;
+}
+
+.container.layout-wide {
+  --text-column-width: 800px;
+  --figure-max-width: var(--text-column-width);
+  /* Dynalist-style overrides */
+  --bg-color: #181818;
+  --font-body: "Whitney", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-heading: "Whitney", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+.container.layout-wide article,
+.container.layout-wide .content {
+  font-family: var(--font-body);
+}
+
+.container.layout-wide h1,
+.container.layout-wide h2,
+.container.layout-wide h3,
+.container.layout-wide h4,
+.container.layout-wide h5,
+.container.layout-wide h6 {
+  font-family: var(--font-heading);
+}
+
+.container.layout-tml {
+  --container-max-width: 950px;
+  --text-column-width: 660px;
+  --figure-max-width: 800px;
+  --font-body: "Iowan Old Style BT", Georgia, serif;
+  --font-heading: "Iowan Old Style BT", Georgia, serif;
+}
+
+@media (min-width: 1200px) {
+  .container.layout-tml {
+    --container-max-width: 970px;
+    --sidenote-width: 210px;
+  }
+}
+
+@media (min-width: 1400px) {
+  .container.layout-tml {
+    --container-max-width: 990px;
+    --sidenote-width: 220px;
+  }
+}
+
+@media (min-width: 1600px) {
+  .container.layout-tml {
+    --container-max-width: 1010px;
+    --sidenote-width: 250px;
+  }
+}
+
+@media (min-width: 1800px) {
+  .container.layout-tml {
+    --container-max-width: 1030px;
+    --sidenote-width: 280px;
+  }
 }
 
 /* The Article themselves */

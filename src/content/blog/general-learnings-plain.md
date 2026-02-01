@@ -4,6 +4,7 @@ description: 'Notes on tensors, physical intuition, and engineering fundamentals
 pubDate: '2026-02-01'
 layoutType: 'wide'
 ---
+
 - **!(2026-02-01) From Scalars to Tensors: The JEE Illusion**
 
   - During JEE/Introductory Physics, we learn that physical constants like conductivity ($\sigma$), permittivity ($\epsilon$), or permeability ($\mu$) are **scalars** (single numbers).
@@ -23,7 +24,7 @@ layoutType: 'wide'
       - **Scalar Result:** $j_y = 0$
       > Physical Reality: The diagonal pipes will "steer" electrons. Push Right (X), they drift Up (Y) because it's the path of least resistance. Reality says $j_y \neq 0$.
 
-    - ==The Roadblock:== Scalar math ($j = \sigma E$) mathematically **cannot** describe a sideways response to a forward push. A single number can only scale a vector; it cannot rotate it.
+    - **The Roadblock:** Scalar math ($j = \sigma E$) mathematically **cannot** describe a sideways response to a forward push. A single number can only scale a vector; it cannot rotate it.
 
   - 2. The Resolution: The Rank-2 Tensor
     - Replace scalar $\sigma$ with a **Rank-2 Tensor** (represented as a matrix). This allows for "cross-talk" between dimensions.
@@ -43,7 +44,7 @@ layoutType: 'wide'
     | --- | --- | --- | --- |
     | **Scalar** | **0** | $n^0 = 1$ | A single magnitude. No direction needed. |
     | **Vector** | **1** | $n^1 = n$ | Requires **1** direction to define a component. |
-    | **Matrix/Tensor** | **2** | $n^2$ | Requires **2** directions (Input → Output). |
+    | **Matrix/Tensor** | **2** | $n^2$ | Requires **2** directions (Input -> Output). |
 
     - **Note on Matrix Rank:** In linear algebra, "rank" refers to the number of linearly independent rows. In Tensors, **Rank** (or Order) refers strictly to the number of indices needed to describe the object.
 

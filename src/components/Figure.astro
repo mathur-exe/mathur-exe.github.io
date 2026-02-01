@@ -47,8 +47,8 @@ const imgStyle = [
 
   .image-container {
     width: 100%;
-    /* Standard width matches the text column */
-    max-width: var(--text-column-width, 660px);
+    /* Standard width matches the figure max width */
+    max-width: var(--figure-max-width, var(--text-column-width, 660px));
     display: flex;
     gap: 1rem;
     padding: 0 1rem; /* Safety padding for mobile */
