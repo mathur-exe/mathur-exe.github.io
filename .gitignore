@@ -25,3 +25,6 @@ pnpm-debug.log*
 .cursor/
 .agent/
 .vscode/
+
+# blog sync logs
+.blog-sync/logs/
